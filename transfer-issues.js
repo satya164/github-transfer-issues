@@ -6,9 +6,10 @@ const args = arg({
   '--org': String,
   '--from': String,
   '--to': String,
-  '--github-username': String,
-  '--github-password': String,
-  '--github-otp': String,
+  '--type': String,
+  '--username': String,
+  '--password': String,
+  '--otp': String,
 });
 
 async function main() {
@@ -19,14 +20,14 @@ async function main() {
   await page.goto('https://github.com/login');
 
   await page.waitForSelector('#login_field');
-  await page.type('#login_field', args['--github-username']);
-  await page.type('#password', args['--github-password']);
+  await page.type('#login_field', args['--username']);
+  await page.type('#password', args['--password']);
   await page.click('.btn.btn-primary.btn-block');
 
   let otp;
 
-  if (args['--github-otp']) {
-    otp = args['--github-otp'];
+  if (args['--otp']) {
+    otp = args['--otp'];
   } else {
     const response = await prompts({
       type: 'text',
@@ -43,7 +44,9 @@ async function main() {
 
   while (true) {
     await page.goto(
-      `https://github.com/${args['--org']}/${args['--from']}/issues?q=is%3Aissue+is%3Aclosed`
+      `https://github.com/${args['--org']}/${
+        args['--from']
+      }/issues?q=is%3Aissue+is%3A${'--type'}`
     );
 
     await page.waitForSelector('[data-hovercard-type="issue"]');
@@ -62,8 +65,12 @@ async function main() {
     await page.waitForSelector(`${transfer} .select-menu-button`);
     await page.click(`${transfer} .select-menu-button`);
 
+    await page.waitFor(1000);
+
     await page.waitForSelector('[placeholder="Find a repository"]');
     await page.type('[placeholder="Find a repository"]', args['--to']);
+
+    await page.waitFor(2000);
 
     await page.waitForSelector(
       '#transfer-possible-repositories-menu .select-menu-item'
