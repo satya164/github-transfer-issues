@@ -46,7 +46,7 @@ async function main() {
     await page.goto(
       `https://github.com/${args['--org']}/${
         args['--from']
-      }/issues?q=is%3Aissue+is%3A${'--type'}`
+      }/issues?q=is%3Aissue+is%3A${args['--type']}`
     );
 
     await page.waitForSelector('[data-hovercard-type="issue"]');
